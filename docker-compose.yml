@@ -45,3 +45,4 @@ networks:
         driver: bridge
 volumes:
     jdu_database:
+
