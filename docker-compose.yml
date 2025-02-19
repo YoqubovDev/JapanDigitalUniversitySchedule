@@ -39,10 +39,9 @@ services:
         networks:
             - jdu_network
         expose:
-            - 3306
+            - 3344
 networks:
     jdu_network:
         driver: bridge
 volumes:
     jdu_database:
-
