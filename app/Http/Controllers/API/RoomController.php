@@ -3,32 +3,43 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Room;
 use Illuminate\Http\Request;
 
 class RoomController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(['message' => 'Room index']);
+        $perPage = $request->get('per_page', 10);
+        $rooms = Room::query()->paginate($perPage);
+
+        return response()->json($rooms);
     }
 
-    public function show($room)
+    public function show(Room $room)
     {
-        return response()->json(['message' => 'Room show']);
+        return response()->json($room);
     }
 
     public function store(Request $request)
     {
-        return response()->json(['message' => 'Room store']);
+        return response()->json($request);
     }
 
-    public function update(Request $request, $room)
+    public function update(Request $request, Room $room)
     {
-        return response()->json(['message' => 'Room update']);
+        $validator = $request->validate([
+            'name' => 'required|string|max:255|min:3',
+        ]);
+        $room->update($validator);
+        return response()->json([
+            'message'=>"Room updated successfully"
+        ],201);
     }
 
-    public function destroy($room)
+    public function destroy(Room $room)
     {
+        $room->delete();
         return response()->json(['message' => 'Room destroy']);
     }
 }
