@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -16,39 +17,45 @@ class AuthController extends Controller
             'password' => 'required|string|confirmed|min:6',
         ]);
 
-      User::query()->create($validator);
+        User::query()->create($validator);
 
         return response()->json([
             'message' => 'User created successfully register'
         ], 201);
     }
+
     public function login(Request $request)
     {
         $validator = $request->validate([
-            'email'=> 'required|email|exists:users,email',
-            'password'=> 'required|string|min:6'
+            'email' => 'required|email|exists:users,email|max:255|string',
+            'password' => 'required|string|min:6'
         ]);
 
-        if (auth()->attempt($validator)) {
-            $token = auth()->user()->createToken('authToken')->plainTextToken;
+        $email = $validator['email'];
+        $password = $validator['password'];
 
+        $user = User::query()->where('email', $email)->first();
+
+        if (!$user || !Hash::check($password, $user->password)) {
             return response()->json([
-                'token' => $token,
-                'user' => auth()->user()
-            ]);
+                'message' => 'The provided credentials are incorrect'
+            ], 401);
         }
+        $token = $user->createToken('token')->plainTextToken;
 
         return response()->json([
-            'message' => 'Invalid credentials'
-        ], 401);
+            'token' => $token,
+            'user' => $user
+        ], 200);
     }
 
-    public function logout()
+    public function logout(Request $request)
     {
-        auth()->user()->tokens()->delete();
-
+        $request->user()->tokens()->delete();
         return response()->json([
-            'message' => 'Logged out'
+            'message' => 'User logged out.'
         ]);
     }
 }
+
+
