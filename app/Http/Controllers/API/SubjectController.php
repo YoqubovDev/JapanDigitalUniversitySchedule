@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Group;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 
@@ -10,25 +11,28 @@ class SubjectController extends Controller
 {
     public function index(Request $request)
     {
-        $subject = Subject::withCount('subjects')
-            ->where('user_id', auth()->user()->id);
-        if (request()->has('search')) {
-            $subject->where('name', 'like', '%' . request('search') . '%')
-                ->orWhere('room', 'like', '%' . request('search') . '%');
+        $perPage = $request->get('per_page', 10);
+        $query = Subject::query();
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->get('search') . '%');
         }
-        if (request()->has('sort_by_date')) {
-            $subject->orderBy('id', 'desc');
+
+        if ($request->boolean('sort_by_date')) {
+            $query->orderBy('id', 'desc');
         }
-       $perPage = $request->get('per_page', 10);
-       $subjects = Subject::query()->paginate($perPage);
-       return response()->json($subjects);
+
+        $subjects = $query->paginate($perPage);
+
+        return response()->json($subjects);
     }
+
 
     public function show(Subject $subject)
     {
         return response()->json($subject);
     }
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $validator = $request->validate([
             'name' => 'required|string|max:255|min:3',
@@ -42,7 +46,7 @@ class SubjectController extends Controller
     public function update(Request $request, Subject $subject)
     {
         $validator = $request->validate([
-            'name' => 'required|string|max:255|min:3',
+            'name' => 'required|unique:subjects,name,' . $subject->id ,
         ]);
         $subject->update($validator);
         return response()->json([
@@ -58,4 +62,5 @@ class SubjectController extends Controller
             'message' => 'Subject deleted successfully'
         ], 201);
     }
+
 }

@@ -11,7 +11,18 @@ class RoomController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->get('per_page', 10);
-        $rooms = Room::query()->paginate($perPage);
+        $query = Room::query();
+//        dd($query);
+
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->get('search') . '%');
+        }
+
+        if ($request->boolean('sort')) {
+            $query->orderBy('id', 'desc');
+        }
+
+        $rooms = $query->paginate($perPage);
 
         return response()->json($rooms);
     }

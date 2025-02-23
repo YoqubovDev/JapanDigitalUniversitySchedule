@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Group;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 
 class GroupController extends Controller
@@ -20,7 +21,7 @@ class GroupController extends Controller
         return response()->json($group);
     }
 
-    public function create(Request $request)
+    public function store(Request $request)
     {
         $validator = $request->validate([
             'name' => 'required|string|max:255|min:3',
