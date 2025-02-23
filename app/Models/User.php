@@ -48,4 +48,17 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    protected $table = 'users';
+
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_student', 'user_id', 'group_id')
+            ->withTimestamps();
+    }
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class, 'subject_teacher', 'user_id', 'subject_id')
+            ->withTimestamps();
+    }
 }
