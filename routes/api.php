@@ -19,6 +19,7 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::resource('subjects', SubjectController::class);
     Route::resource('rooms', RoomController::class);
     Route::resource('groups', GroupController::class);
+
     Route::post('group/{id}/subject', [GroupSubjectController::class, 'attachSubjectToGroup']);
     Route::post('subject/{id}/teacher', [SubjectTeacherController::class, 'attachTeacherToSubject']);
     Route::post('group/{id}/student', [GroupStudentController::class, 'attachGroupToStudent']);
