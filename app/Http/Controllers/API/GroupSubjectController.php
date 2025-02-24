@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class GroupSubjectController extends Controller
 {
-    public function attachSubjectToGroup(Request $request, $id)
+    public function store(Request $request, $id)
     {
         $validator = $request->validate([
             'subject_id' => 'required|exists:subjects,id',

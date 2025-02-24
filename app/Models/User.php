@@ -49,8 +49,10 @@ class User extends Authenticatable
         ];
     }
 
-    protected $table = 'users';
-
+  public function roles()
+  {
+        return $this->belongsToMany(Role::class);
+  }
     public function groups()
     {
         return $this->belongsToMany(Group::class, 'group_student', 'user_id', 'group_id')
