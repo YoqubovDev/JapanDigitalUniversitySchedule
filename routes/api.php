@@ -1,13 +1,14 @@
 <?php
 
 use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\GropMemberController;
 use App\Http\Controllers\API\GroupController;
-use App\Http\Controllers\API\GroupStudentController;
+
 use App\Http\Controllers\API\GroupSubjectController;
 use App\Http\Controllers\API\RoleUserController;
 use App\Http\Controllers\API\RoomController;
 use App\Http\Controllers\API\SubjectController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\API\SubjectTeacherController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('register', [AuthController::class, 'register']);
@@ -19,10 +20,9 @@ Route::middleware('auth:sanctum')->group(function (){
     Route::resource('rooms', RoomController::class);
     Route::resource('groups', GroupController::class);
     Route::resource('role-user', RoleUserController::class);
-
-//    Route::post('group/{id}/subject', [GroupSubjectController::class, 'attachSubjectToGroup']);
-
-//    Route::resource('group/{id}', GroupSubjectController::class);
+    Route::resource('group-subjects', GroupSubjectController::class);
+    Route::resource('subject-teachers', SubjectTeacherController::class);
+    Route::resource('group-members', GropMemberController::class);
 });
 
 

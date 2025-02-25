@@ -55,7 +55,7 @@ class User extends Authenticatable
   }
     public function groups()
     {
-        return $this->belongsToMany(Group::class, 'group_student', 'user_id', 'group_id')
+        return $this->belongsToMany(Group::class)
             ->withTimestamps();
     }
     public function subjects()

@@ -10,4 +10,9 @@ class Role extends Model
 {
     /** @use HasFactory<RoleFactory> */
     use HasFactory;
+
+    public function users()
+    {
+
+    }
 }

@@ -27,14 +27,21 @@ class RoleUserController extends Controller
         ], 201);
     }
 
-
-
     /**
      * Update the specified resource in storage.
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validator = $request->validate([
+            'role_id'=>'required|exists:roles,id',
+        ]);
+        $user = User::query()->find($id);
+
+        $user->roles()->detach($validator['role_id']);
+
+        return response()->json([
+            'message' => 'Role detached from user'
+        ]);
     }
 
     /**

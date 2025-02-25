@@ -25,4 +25,5 @@ class Group extends Model
         return $this->belongsToMany(Subject::class, 'group_student', 'group_id', 'user_id')
             ->withTimestamps();
     }
+
 }
