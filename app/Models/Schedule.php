@@ -11,13 +11,14 @@ class Schedule extends Model
     /** @use HasFactory<ScheduleFactory> */
     use HasFactory;
     public $timestamps = true;
+
     protected $fillable = [
-        'group_id',
         'subject_id',
         'teacher_id',
+        'group_id',
         'room_id',
+        'pair',
+        'week_day',
         'date',
-        'start_time',
-        'end_time',
         ];
 }
