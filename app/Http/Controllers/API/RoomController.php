@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoomRequest;
+use App\Http\Requests\UpdateSubjectRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
 
@@ -40,11 +41,9 @@ class RoomController extends Controller
         return response()->json($request);
     }
 
-    public function update(Request $request, Room $room)
+    public function update(UpdateSubjectRequest $request, Room $room)
     {
-        $validator = $request->validate([
-            'name' => 'required|string|max:255|min:3',
-        ]);
+        $validator = $request->validated();
         $room->update($validator);
         return response()->json([
             'message'=>"Room updated successfully"
