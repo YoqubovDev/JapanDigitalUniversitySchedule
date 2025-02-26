@@ -3,19 +3,16 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreAuthRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(StoreAuthRequest $request)
     {
-        $validator = $request->validate([
-            'name' => 'required|string|max:255|min:3',
-            'email' => 'required|email|unique:users,email|max:255|unique:users,email',
-            'password' => 'required|string|confirmed|min:6',
-        ]);
+        $validator = $request->validated();
 
         User::query()->create($validator);
 
