@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Schedule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateScheduleRequest extends FormRequest
 {
@@ -22,14 +23,39 @@ class UpdateScheduleRequest extends FormRequest
      */
     public function rules(): array
     {
+        $schedule=$this->route('schedule');
         return [
             'subject_id'=>'required|exists:subjects,id',
-            'user_id'=>'required|exists:users.id',
-            'group_id'=>'required|exists:groups,id',
-            'room_id'=>'required|exists:rooms,id',
+            'teacher_id'=>[
+                'required',
+                'exists:users,id',
+                Rule::unique('schedules', 'teacher_id')
+                    ->where(fn ($query) => $query->where('pair', $this->pair)
+                        ->where('week_day', $this->week_day)
+                            ->where('date', $this->date))
+                            ->ignore($schedule->id)
+            ],
+            'group_id'=>[
+                'required',
+                'exists:groups,id',
+                Rule::unique('schedules', 'group_id')
+                    ->where(fn ($query) => $query->where('pair', $this->pair)
+                        ->where('week_day', $this->week_day)
+                        ->where('date', $this->date))
+                    ->ignore($schedule->id)
+            ],
+            'room_id'=>[
+                'required',
+                'exists:rooms,id',
+                Rule::unique('schedules', 'group_id')
+                    ->where(fn ($query) => $query->where('pair', $this->pair)
+                        ->where('week_day', $this->week_day)
+                        ->where('date', $this->date))
+                    ->ignore($schedule->id)
+            ],
             'pair'=>'required|integer|between:1,7',
-            'week_day'=>'required|string|in:Monday,Tuesday,Wednesday,Thursday,Friday,Saturday,Sunday',
-            'date'=>'required|date',
+            'week_day' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+            'date'=>'required|date'
         ];
 
     }
@@ -43,15 +69,18 @@ class UpdateScheduleRequest extends FormRequest
         });
     }
 
-    public function hasDublicateSchedule():bool
+    public function hasDublicateSchedule(): bool
     {
-        return Schedule::query()->where('subject_id', $this->subject_id)
+        $schedule = $this->route('schedule');
+        return Schedule::query()
+            ->where('subject_id', $this->subject_id)
             ->where('teacher_id', $this->teacher_id)
             ->where('group_id', $this->group_id)
+            ->where('room_id', $this->room_id)
             ->where('pair', $this->pair)
             ->where('week_day', $this->week_day)
             ->where('date', $this->date)
-            ->where('id', '!=', $this->id)
+            ->where('id', '!=', $schedule ? $schedule->id : null)
             ->exists();
     }
 }

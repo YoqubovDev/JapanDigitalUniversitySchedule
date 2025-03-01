@@ -10,15 +10,19 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(StoreAuthRequest $request)
+    public function register(Request $request)
     {
-        $validator = $request->validated();
+        $validator = $request->validate([
+            'name' => 'required|string|max:255|min:3',
+            'email' => 'required|email|unique:users,email|max:255|unique:users,email',
+            'password' => 'required|string|confirmed|min:6',
+        ]);
 
-        User::query()->create($validator);
+        $user=User::query()->create($validator);
 
-        return response()->json([
-            'message' => 'User created successfully register'
-        ], 201);
+        $token = $user->createToken('authToken')->plainTextToken;
+
+        return apiResponse('User registered successfully', 201, ['user' => $user], $token);
     }
 
     public function login(Request $request)
