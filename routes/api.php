@@ -15,6 +15,11 @@ use Illuminate\Support\Facades\Route;
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
 
+Route::prefix('auth')->group(function () {
+    Route::get('/redirect/{provider}', [AuthController::class, 'redirectToProvider']);
+    Route::get('/callback/{provider}', [AuthController::class, 'handleProviderCallback']);
+});
+
 Route::middleware('auth:sanctum')->group(function (){
     Route::post('logout', [AuthController::class, 'logout']);
     Route::resource('subjects', SubjectController::class);

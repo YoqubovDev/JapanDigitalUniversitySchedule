@@ -57,6 +57,28 @@ class AuthController extends Controller
             'message' => 'User logged out.'
         ]);
     }
+
+    public function redirectToProvider($provider)
+    {
+        return Socialite::driver($provider)->stateless()->redirect();
+    }
+
+    public function handleProviderCallback($provider)
+    {
+        $user = Socialite::driver($provider)->stateless()->user();
+        $user = User::firstOrCreate([
+            'email' => $user->email
+        ], [
+            'name' => $user->name,
+            'password' => Hash::make(Str::random(24))
+        ]);
+
+        $token = $user->createToken('API Token')->plainTextToken;
+
+        return response()->json(['token' => $token]);
+    }
+
+
 }
 
 
