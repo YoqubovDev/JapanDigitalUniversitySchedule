@@ -8,7 +8,7 @@ use App\Models\Subject;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class GroupMemberControllerTest extends TestCase
+class SubjectTeacherControllerTest extends TestCase
 {
     use RefreshDatabase;
 
