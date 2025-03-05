@@ -23,18 +23,26 @@ class GroupController extends Controller
         return response()->json($group);
     }
 
-    public function store(StoreGroupRequest $request)
+    public function store(Request $request)
     {
-        $validator = $request->validated();
+        $validator = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+            ]
+        );
         Group::query()->create($validator);
         return response()->json([
             'message' => 'Group created successfully'
-        ], 201);
+        ], 200);
     }
 
-    public function update(UpdateGroupRequest $request, $group)
+    public function update(Request $request, $group)
     {
-        $validator = $request->validated();
+        $validator = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+            ]
+        );
         $group->update($validator);
         return response()->json([
             'message' => 'Group updated successfully'
@@ -45,6 +53,6 @@ class GroupController extends Controller
     public function destroy( Group $group)
     {
         $group->delete();
-        return response()->json(['message' => 'Group destroy']);
+        return response()->json(['message' => 'Group deleted successfully']);
     }
 }

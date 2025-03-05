@@ -33,17 +33,24 @@ class RoomController extends Controller
     {
         return response()->json($room);
     }
-
-    public function store(StoreRoomRequest $request)
+    public function store(Request $request)
     {
-        $validator = $request->validated();
+        $validator = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
         Room::query()->create($validator);
-        return response()->json($request);
+        return response()->json([
+            'message' => 'Room created successfully'
+        ],200);
     }
 
-    public function update(UpdateSubjectRequest $request, Room $room)
+    public function update(Request $request, Room $room)
     {
-        $validator = $request->validated();
+        $validator = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+            ]
+        );
         $room->update($validator);
         return response()->json([
             'message'=>"Room updated successfully"
@@ -53,6 +60,6 @@ class RoomController extends Controller
     public function destroy(Room $room)
     {
         $room->delete();
-        return response()->json(['message' => 'Room destroy']);
+        return response()->json(['message' => 'Room deleted successfully']);
     }
 }

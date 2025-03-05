@@ -11,13 +11,6 @@ use Illuminate\Http\Request;
 
 class ScheduleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        //
-    }
 
 
     /**
@@ -49,10 +42,12 @@ class ScheduleController extends Controller
      */
     public function update(UpdateScheduleRequest $request, Schedule $schedule)
     {
-        $validated = $request->validated(); // Validate input
-        $schedule->update($validated); // Update the schedule
+        $validated = $request->validated();
+        $schedule->update($validated);
 
-        return response()->json(['message' => 'Schedule updated successfully'], 200);
+        return response()->json([
+            'success' => true,
+            'message' => 'Schedule updated successfully'], 200);
     }
 
     /**

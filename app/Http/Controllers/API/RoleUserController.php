@@ -1,5 +1,5 @@
 <?php
-
+//waring
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
@@ -16,9 +16,14 @@ class RoleUserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRoleRequest $request)
+    public function store(Request $request)
     {
-        $validator = $request->validated();
+        $validator = $request->validate(
+            [
+                'user_id' => 'required|exists:users,id',
+                'role_id' => 'required|exists:roles,id',
+            ]
+        );
         $user = User::query()->find($validator['user_id']);
 
         $user->roles()->attach($validator['role_id'], ['created_at' => now(), 'updated_at' => now()]);
@@ -31,16 +36,21 @@ class RoleUserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRoleRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
-        $validator = $request->validated();
-        $user = User::query()->find($id);
+        $validator = $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
 
-        $user->roles()->detach($validator['role_id']);
+        $user = User::findOrFail($id);
+
+        // Eski role'ni o'chirib, yangisini qo'shamiz
+        $user->roles()->sync([$validator['role_id']]);
 
         return response()->json([
-            'message' => 'Role detached from user'
+            'message' => 'User role updated successfully'
         ]);
+
     }
 
     /**

@@ -34,18 +34,24 @@ class SubjectController extends Controller
     {
         return response()->json($subject);
     }
-    public function store(StoreSubjectRequest $request)
+    public function store(Request $request)
     {
-        $validator = $request->validated();
+        $validator = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
         Subject::query()->create($validator);
         return response()->json([
             'message' => 'Subject created successfully'
-        ], 201);
+        ], 200);
     }
 
     public function update(UpdateSubjectRequest $request, Subject $subject)
     {
-        $validator = $request->validated();
+        $validator = $request->validate(
+            [
+                'name' => 'required|string|max:255',
+            ]
+        );
         $subject->update($validator);
         return response()->json([
             'message' => 'Subject updated successfully'
@@ -58,7 +64,7 @@ class SubjectController extends Controller
         $subject->delete();
         return response()->json([
             'message' => 'Subject deleted successfully'
-        ], 201);
+        ], 200);
     }
 
 }
