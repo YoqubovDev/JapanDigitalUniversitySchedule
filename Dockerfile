@@ -1,12 +1,5 @@
 FROM php:8.3-fpm
 
-ARG UID=1000
-ARG GID=1000
-
-# Modify existing www-data user and group to match host UID and GID
-RUN usermod -u ${UID} www-data && \
-    groupmod -g ${GID} www-data
-
 WORKDIR /var/www
 RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
@@ -42,4 +35,4 @@ RUN composer install
 RUN php artisan key:generate
 RUN chown -R www-data:www-data /var/www
 RUN chmod -R 755 /var/www
-RUN chmod -R 777 /var/www/storage
+RUN chmod -R 777 /var/www
