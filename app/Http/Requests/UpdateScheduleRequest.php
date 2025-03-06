@@ -50,7 +50,7 @@ class UpdateScheduleRequest extends FormRequest
                         ->where('week_day', $this->week_day)->where('date', $this->date))
                     ->ignore($schedule->id),
             ],
-            'pair'=>'required|integer|between:1,7',
+            'pair'=>'required|integer|between:1,6',
             'week_day'=>'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'date'=>'required|date'
         ];

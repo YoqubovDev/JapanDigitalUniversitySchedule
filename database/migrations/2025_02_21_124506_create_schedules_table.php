@@ -1,35 +1,27 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateSchedulesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
+    public function up()
     {
         Schema::create('schedules', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('subject_id')->constrained();
-            $table->foreignId('teacher_id')->constrained('users');
-            $table->foreignId('group_id')->constrained();
-            $table->foreignId('room_id')->constrained();
-            $table->tinyInteger('pair');
-            $table->enum('week_day', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+            $table->unsignedBigInteger('subject_id');
+            $table->unsignedBigInteger('teacher_id');
+            $table->unsignedBigInteger('group_id');
+            $table->unsignedBigInteger('room_id');
+            $table->integer('pair');
+            $table->string('week_day');
             $table->date('date');
-            $table->unique(['subject_id','teacher_id','group_id','pair','week_day','date'],'schedule_unique');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('schedules');
     }
-};
+}

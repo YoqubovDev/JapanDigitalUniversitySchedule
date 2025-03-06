@@ -45,7 +45,7 @@ class StoreScheduleRequest extends FormRequest
                     ->where(fn ($query) => $query->where('pair', $this->pair)
                         ->where('week_day', $this->week_day)->where('date', $this->date))
             ],
-            'pair'=>'required|integer|between:1,7',
+            'pair'=>'required|integer|between:1,6',
             'week_day'=>'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'date'=>'required|date'
         ];
