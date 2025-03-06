@@ -42,11 +42,11 @@ jobs:
       - name: executing remote ssh commands using private key
         uses: appleboy/ssh-action@v1.1.0
         with:
-          host: ${{ secrets.HOST }}
+          host: ${{ secrets.HOST}}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.KEY }}
           script: |
-            cd /var/www/jdu
+            cd /var/www/JapanDigitalUniversitySchedule
             sudo docker compose down
             sudo git reset --hard
             sudo git pull
