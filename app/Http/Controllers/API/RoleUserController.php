@@ -1,12 +1,10 @@
 <?php
-//waring
+
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoleRequest;
-use App\Http\Requests\StoreRoomRequest;
 use App\Http\Requests\UpdateRoleRequest;
-use App\Http\Requests\UpdateSubjectRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -16,41 +14,34 @@ class RoleUserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $validator = $request->validate(
-            [
-                'user_id' => 'required|exists:users,id',
-                'role_id' => 'required|exists:roles,id',
-            ]
-        );
-        $user = User::query()->find($validator['user_id']);
+        $validator = $request->validated();
 
-        $user->roles()->attach($validator['role_id'], ['created_at' => now(), 'updated_at' => now()]);
+        $user = User::query()
+            ->find($validator['user_id']);
+
+        $user->roles()->attach($validator['role_id']);
 
         return response()->json([
-            'message' => 'Role attached to user'
-        ], 201);
+            'success' => true,
+        ]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update thStudent already in roupe specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateRoleRequest $request, string $id)
     {
-        $validator = $request->validate([
-            'role_id' => 'required|exists:roles,id',
-        ]);
+        $validator = $request->validated();
 
-        $user = User::findOrFail($id);
+        $user = User::query()
+            ->find($validator['user_id']);
 
-        // Eski role'ni o'chirib, yangisini qo'shamiz
-        $user->roles()->sync([$validator['role_id']]);
-
+        $user->roles()->sync($validator['role_id']);
         return response()->json([
-            'message' => 'User role updated successfully'
-        ]);
-
+            'success' => true,
+        ],201);
     }
 
     /**
@@ -59,14 +50,15 @@ class RoleUserController extends Controller
     public function destroy(string $id, Request $request)
     {
         $validator = $request->validate([
-            'role_id'=>'required|exists:roles,id',
+            'role_id' => 'required|exists:roles,id',
         ]);
-        $user = User::query()->find($id);
 
+        $user = User::query()
+            ->find($id);
         $user->roles()->detach($validator['role_id']);
 
         return response()->json([
-            'message' => 'Role detached from user'
+            'success' => true,
         ]);
     }
 }

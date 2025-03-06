@@ -10,13 +10,9 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function register(Request $request)
+    public function register(StoreAuthRequest $request)
     {
-        $validatedData = $request->validate([
-            'name' => 'required|string|max:255|min:3',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|confirmed|min:6',
-        ]);
+        $validatedData = $request->validated();
 
         $validatedData['password'] = Hash::make($validatedData['password']); // Parolni xaslash
 

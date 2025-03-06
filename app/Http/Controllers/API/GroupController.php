@@ -23,32 +23,31 @@ class GroupController extends Controller
         return response()->json($group);
     }
 
-    public function store(Request $request)
+    public function store(StoreGroupRequest $request)
     {
-        $validator = $request->validate(
-            [
-                'name' => 'required|string|max:255',
-            ]
-        );
-        Group::query()->create($validator);
+        $validatorDate = $request->validated();
+        Group::query()->create($validatorDate);
         return response()->json([
             'message' => 'Group created successfully'
         ], 200);
     }
 
-    public function update(Request $request, $group)
+    public function update(UpdateGroupRequest $request, Group $group)
     {
-        $validator = $request->validate(
-            [
-                'name' => 'required|string|max:255',
-            ]
-        );
-        $group->update($validator);
-        return response()->json([
-            'message' => 'Group updated successfully'
-        ], 201);
+        // Validate the request data
+        $validatedData = $request->validated();
 
+        // Update the group with the validated data
+        $group->update($validatedData);
+
+        // Return the response with status code 200 (OK)
+        return response()->json([
+            'message' => 'Group updated successfully',
+        ], 200);
     }
+
+
+
 
     public function destroy( Group $group)
     {

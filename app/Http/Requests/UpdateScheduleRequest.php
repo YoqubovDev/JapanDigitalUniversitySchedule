@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Schedule;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -24,64 +23,36 @@ class UpdateScheduleRequest extends FormRequest
      */
     public function rules(): array
     {
-        $schedule=$this->route('schedule');
+        $schedule = $this->route('schedule');
         return [
-            'subject_id'=>'required|exists:subjects,id',
-            'teacher_id'=>[
+            'subject_id' => 'required|exists:subjects,id',
+            'teacher_id' => [
                 'required',
                 'exists:users,id',
                 Rule::unique('schedules', 'teacher_id')
                     ->where(fn ($query) => $query->where('pair', $this->pair)
-                        ->where('week_day', $this->week_day)
-                            ->where('date', $this->date))
-                            ->ignore($schedule->id)
+                        ->where('week_day', $this->week_day)->where('date', $this->date))
+                    ->ignore($schedule->id)
             ],
-            'group_id'=>[
+            'group_id' => [
                 'required',
                 'exists:groups,id',
                 Rule::unique('schedules', 'group_id')
                     ->where(fn ($query) => $query->where('pair', $this->pair)
-                        ->where('week_day', $this->week_day)
-                        ->where('date', $this->date))
+                        ->where('week_day', $this->week_day)->where('date', $this->date))
                     ->ignore($schedule->id)
             ],
-            'room_id'=>[
+            'room_id' => [
                 'required',
                 'exists:rooms,id',
-                Rule::unique('schedules', 'group_id')
+                Rule::unique('schedules', 'room_id')
                     ->where(fn ($query) => $query->where('pair', $this->pair)
-                        ->where('week_day', $this->week_day)
-                        ->where('date', $this->date))
-                    ->ignore($schedule->id)
+                        ->where('week_day', $this->week_day)->where('date', $this->date))
+                    ->ignore($schedule->id),
             ],
             'pair'=>'required|integer|between:1,7',
-            'week_day' => 'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
+            'week_day'=>'required|string|in:monday,tuesday,wednesday,thursday,friday,saturday,sunday',
             'date'=>'required|date'
         ];
-
-    }
-
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            if ($this->hasDublicateSchedule()) {
-                $validator->errors()->add('schedule', 'Schedule already exists');
-            }
-        });
-    }
-
-    public function hasDublicateSchedule(): bool
-    {
-        $schedule = $this->route('schedule');
-        return Schedule::query()
-            ->where('subject_id', $this->subject_id)
-            ->where('teacher_id', $this->teacher_id)
-            ->where('group_id', $this->group_id)
-            ->where('room_id', $this->room_id)
-            ->where('pair', $this->pair)
-            ->where('week_day', $this->week_day)
-            ->where('date', $this->date)
-            ->where('id', '!=', $schedule ? $schedule->id : null)
-            ->exists();
     }
 }

@@ -57,18 +57,26 @@ class GroupControllerTest extends TestCase
             ->assertJson(['id'=>$group->id, 'name'=>$group->name]);
     }
 
-    public function test_can_update_group()                                    //500
+    public function test_can_update_group()
     {
-        $group=Group::factory()->create();
-        $response=$this->putJson("/api/groups/{$group->id}",[
-               'name' => 'Updated Group'
+        $group = Group::factory()->create();
+
+        $response = $this->putJson("/api/groups/{$group->id}", [
+            'name' => 'Updated Group',
+        ]);
+
+        $response->assertStatus(200)
+            ->assertJson([
+                'message' => 'Group updated successfully',
             ]);
-        $response->assertStatus(201)
-               ->assertJson([
-                   'message' => 'Group updated successfully'
-            ]);
-       $this->assertDatabaseHas('groups',['id'=>$group->id,'name'=>'Updated Group']);
+
+        $this->assertDatabaseHas('groups', [
+            'id' => $group->id,
+            'name' => 'Updated Group',
+        ]);
     }
+
+
 
     public function test_can_delete_group()
     {

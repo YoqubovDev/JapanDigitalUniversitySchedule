@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreRoleRequest extends FormRequest
@@ -17,15 +18,13 @@ class StoreRoleRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
     public function rules(): array
     {
         return [
-            [
-                'role_id'=>'required|exists:roles,id',
-                'user_id'=>'required|exists:users,id'
-            ]
+            'role_id' => 'required|exists:roles,id',
+            'user_id' => 'required|exists:users,id',
         ];
     }
 }

@@ -34,11 +34,9 @@ class SubjectController extends Controller
     {
         return response()->json($subject);
     }
-    public function store(Request $request)
+    public function store(StoreSubjectRequest $request)
     {
-        $validator = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
+        $validator = $request->validated();
         Subject::query()->create($validator);
         return response()->json([
             'message' => 'Subject created successfully'
@@ -47,11 +45,7 @@ class SubjectController extends Controller
 
     public function update(UpdateSubjectRequest $request, Subject $subject)
     {
-        $validator = $request->validate(
-            [
-                'name' => 'required|string|max:255',
-            ]
-        );
+        $validator = $request->validated();
         $subject->update($validator);
         return response()->json([
             'message' => 'Subject updated successfully'

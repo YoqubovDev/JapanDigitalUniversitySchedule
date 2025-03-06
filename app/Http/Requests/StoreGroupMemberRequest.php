@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreGroupMemberRequest extends FormRequest
@@ -17,15 +18,14 @@ class StoreGroupMemberRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array|string>
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            [
-                'group_id'=>'required|exists:groups,id',
-                'user_id'=>'required|exists:subjects,id'
-            ]
+            'group_id' => 'required|exists:groups,id',
+            'user_id' => 'required|exists:users,id',
         ];
     }
+
 }

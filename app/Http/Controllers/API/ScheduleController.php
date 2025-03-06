@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreScheduleRequest;
-use App\Http\Requests\StoreSubjectRequest;
 use App\Http\Requests\UpdateScheduleRequest;
 use App\Models\Schedule;
 use Illuminate\Http\Request;
@@ -12,6 +11,13 @@ use Illuminate\Http\Request;
 class ScheduleController extends Controller
 {
 
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
+    {
+        //
+    }
 
     /**
      * Store a newly created resource in storage.
@@ -19,23 +25,19 @@ class ScheduleController extends Controller
     public function store(StoreScheduleRequest $request)
     {
         $validated = $request->validated();
-        $schedule = Schedule::query()
-            ->where('subject_id', $validated['subject_id'])
-            ->where('teacher_id', $validated['teacher_id']) // Changed from 'user_id'
-            ->where('group_id', $validated['group_id'])
-            ->where('pair', $validated['pair'])
-            ->where('week_day', $validated['week_day'])
-            ->where('date', $validated['date'])
-            ->first();
-
-        if ($schedule){
-            return response()->json(['message'=>'Schedule already exists'], 409);
-        }
-
         Schedule::query()->create($validated);
-        return response()->json(['message'=>'Schedule created successfully'], 201);
+        return response()->json([
+            'message' => 'Schedule created successfully'
+        ],200);
     }
 
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        return response()->json($schedule = Schedule::query()->find($id));
+    }
 
     /**
      * Update the specified resource in storage.
@@ -44,10 +46,9 @@ class ScheduleController extends Controller
     {
         $validated = $request->validated();
         $schedule->update($validated);
-
         return response()->json([
-            'success' => true,
-            'message' => 'Schedule updated successfully'], 200);
+            'message' => 'Schedule updated successfully',
+        ],201);
     }
 
     /**

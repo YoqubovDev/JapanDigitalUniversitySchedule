@@ -23,7 +23,7 @@ class SubjectTeacherControllerTest extends TestCase
         ]);
 
         $response->assertStatus(201)
-            ->assertJson(['message' => 'Student attached to group successfully']);
+            ->assertJson(['message' => 'Student update group successfully']);
 
         $this->assertDatabaseHas('group_user', [
             'group_id' => $group->id,

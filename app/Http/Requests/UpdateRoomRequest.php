@@ -2,8 +2,10 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Role;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdateRoomRequest extends FormRequest
 {
@@ -23,9 +25,13 @@ class UpdateRoomRequest extends FormRequest
     public function rules(): array
     {
         return [
-            [
-                'name' => 'required|string|max:255|min:3',
-            ]
+            'name'=>[
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('rooms','name')->ignore($this->route('group'))
+            ],
         ];
     }
 }
+

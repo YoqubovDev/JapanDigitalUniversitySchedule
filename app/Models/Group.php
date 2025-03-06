@@ -20,10 +20,9 @@ class Group extends Model
         return $this->belongsToMany(Subject::class, 'group_subject', 'group_id', 'subject_id')
             ->withTimestamps();
     }
-    public function students()
+    public function users()
     {
-        return $this->belongsToMany(Subject::class, 'group_student', 'group_id', 'user_id')
+        return $this->belongsToMany(User::class, 'group_student', 'group_id', 'user_id')
             ->withTimestamps();
     }
-
 }

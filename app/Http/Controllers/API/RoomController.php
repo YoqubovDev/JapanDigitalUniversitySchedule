@@ -4,6 +4,8 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreRoomRequest;
+use App\Http\Requests\UpdateGroupRequest;
+use App\Http\Requests\UpdateRoomRequest;
 use App\Http\Requests\UpdateSubjectRequest;
 use App\Models\Room;
 use Illuminate\Http\Request;
@@ -14,7 +16,6 @@ class RoomController extends Controller
     {
         $perPage = $request->get('per_page', 10);
         $query = Room::query();
-//        dd($query);
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->get('search') . '%');
@@ -33,25 +34,19 @@ class RoomController extends Controller
     {
         return response()->json($room);
     }
-    public function store(Request $request)
+    public function store(StoreRoomRequest $request)
     {
-        $validator = $request->validate([
-            'name' => 'required|string|max:255',
-        ]);
-        Room::query()->create($validator);
+        $validatorDate = $request->validated();
+        Room::query()->create($validatorDate);
         return response()->json([
             'message' => 'Room created successfully'
         ],200);
     }
 
-    public function update(Request $request, Room $room)
+    public function update(UpdateRoomRequest $request, Room $room)
     {
-        $validator = $request->validate(
-            [
-                'name' => 'required|string|max:255',
-            ]
-        );
-        $room->update($validator);
+        $validatorDate = $request->validated();
+        $room->update($validatorDate);
         return response()->json([
             'message'=>"Room updated successfully"
         ],201);
