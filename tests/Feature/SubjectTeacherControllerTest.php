@@ -2,9 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Models\Group;
-use App\Models\User;
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,79 +11,121 @@ class SubjectTeacherControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_student_can_be_attached_to_group()
+    protected $user;
+    protected $token;
+
+    protected function setUp(): void
     {
-        $group = Group::factory()->create();
-        $user = User::factory()->create();
-
-        $response = $this->postJson('/api/group-members', [
-            'group_id' => $group->id,
-            'user_id' => $user->id,
-        ]);
-
-        $response->assertStatus(201)
-            ->assertJson(['message' => 'Student update group successfully']);
-
-        $this->assertDatabaseHas('group_user', [
-            'group_id' => $group->id,
-            'user_id' => $user->id,
-        ]);
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->token = $this->user->createToken('test-token')->plainTextToken;
     }
 
-    public function test_student_can_be_detached_from_group()
-    {
-        $group = Group::factory()->create();
-        $user = User::factory()->create();
-        $group->students()->attach($user->id);
-
-        $response = $this->deleteJson("/api/group-members/{$user->id}", [
-            'group_id' => $group->id,
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJson(['message' => 'Student  detached from group successfully']);
-
-        $this->assertDatabaseMissing('group_user', [
-            'group_id' => $group->id,
-            'user_id' => $user->id,
-        ]);
-    }
-
-    public function test_teacher_can_be_attached_to_subject()
+    public function test_can_attach_user_to_group()
     {
         $subject = Subject::factory()->create();
-        $teacher = User::factory()->create();
-
-        $response = $this->postJson('/api/subject-teachers', [
-            'subject_id' => $subject->id,
-            'user_id' => $teacher->id,
-        ]);
-
+        $user = User::factory()->create();
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->postJson('/api/subject-teachers', [
+                'subject_id' => $subject->id,
+                'user_id' => $user->id,
+            ]);
         $response->assertStatus(201)
-            ->assertJson(['message' => 'Subject Teacher Added']);
-
-        $this->assertDatabaseHas('subject_user', [
+            ->assertJson(['message' => 'Teacher attached to subject successfully']);
+        $this->assertDatabaseHas('subject_teacher', [
             'subject_id' => $subject->id,
-            'user_id' => $teacher->id,
+            'user_id' => $user->id,
         ]);
     }
 
-    public function test_teacher_can_be_detached_from_subject()
+    public function test_cannot_attach_to_nonexistent_group()
+    {
+        $user = User::factory()->create();
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->postJson('/api/subject-teachers', [
+                'subject_id' => 999,
+                'user_id' => $user->id,
+            ]);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['subject_id']);
+    }
+
+    public function test_validation_fails_on_store()
+    {
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->postJson('/api/subject-teachers', []);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['subject_id', 'user_id']);
+    }
+
+    public function test_can_detach_user_from_group_via_update()
     {
         $subject = Subject::factory()->create();
-        $teacher = User::factory()->create();
-        $teacher->subjects()->attach($subject->id);
-
-        $response = $this->deleteJson("/api/subject-teachers/{$teacher->id}", [
-            'subject_id' => $subject->id,
-        ]);
-
+        $subject->teachers()->attach($this->user->id);  // Use teachers() instead of users()
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->putJson("/api/subject-teachers/{$subject->id}", [
+                'user_id' => $this->user->id,
+            ]);
         $response->assertStatus(200)
-            ->assertJson(['message' => 'Teacher detached from group successfully']);
-
-        $this->assertDatabaseMissing('subject_user', [
+            ->assertJson(['message' => 'Teacher update from subject successfully']);
+        $this->assertDatabaseMissing('subject_teacher', [
             'subject_id' => $subject->id,
-            'user_id' => $teacher->id,
+            'user_id' => $this->user->id,
         ]);
+    }
+
+    public function test_cannot_detach_from_nonexistent_group_via_update()
+    {
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->putJson('/api/subject-teachers/999', [
+                'user_id' => $this->user->id,
+            ]);
+        $response->assertStatus(404);
+    }
+
+    public function test_validation_fails_on_update()
+    {
+        $subject = Subject::factory()->create();
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->putJson("/api/subject-teachers/{$subject->id}", []);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['user_id']);
+    }
+
+    public function test_can_detach_user_from_group_via_destroy()
+    {
+        $subject = Subject::factory()->create();
+        $user = User::factory()->create();
+        $subject->teachers()->attach($user->id);  // Use teachers() instead of users()
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->deleteJson("/api/subject-teachers/{$user->id}", [
+                'subject_id' => $subject->id,
+            ]);
+        $response->assertStatus(200)
+            ->assertJson(['message' => 'Teacher detached from subject successfully']);
+        $this->assertDatabaseMissing('subject_teacher', [
+            'subject_id' => $subject->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function test_cannot_detach_with_invalid_group_id_via_destroy()
+    {
+        $user = User::factory()->create();
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->deleteJson("/api/subject-teachers/{$user->id}", [
+                'subject_id' => 999,
+            ]);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['subject_id']);
+    }
+
+    public function test_validation_fails_on_destroy()
+    {
+        $user = User::factory()->create();
+        $response = $this->withHeaders(['Authorization' => "Bearer {$this->token}"])
+            ->deleteJson("/api/subject-teachers/{$user->id}", []);
+        $response->assertStatus(422)
+            ->assertJsonValidationErrors(['subject_id']);
     }
 }

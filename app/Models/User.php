@@ -63,4 +63,7 @@ class User extends Authenticatable
         return $this->belongsToMany(Subject::class, 'subject_teacher', 'user_id', 'subject_id')
             ->withTimestamps();
     }
+
+
+
 }
