@@ -3,7 +3,7 @@ services:
         container_name: jdu_web
         image: nginx:alpine
         ports:
-            - "8050:80"
+            - "8020:80"
         volumes:
             - ./:/var/www
             - ./nginx.conf:/etc/nginx/conf.d/default.conf
