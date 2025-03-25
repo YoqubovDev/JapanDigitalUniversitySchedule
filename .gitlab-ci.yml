@@ -1,0 +1,19 @@
+stages:
+  - build
+  - test
+
+build_job:
+  stage: build
+  image: php:8.2
+  script:
+    - php -v
+    - composer install
+  artifacts:
+    paths:
+      - vendor/
+
+test_job:
+  stage: test
+  image: php:8.2
+  script:
+    - vendor/bin/phpunit
