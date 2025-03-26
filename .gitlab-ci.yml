@@ -3,15 +3,17 @@ stages:
   - deploy
 
 variables:
-  DB_CONNECTION: sqlite
-  DB_DATABASE: database/database.sqlite
+  DB_CONNECTION: mysql
+  DB_HOST: jdu_db
+  DB_DATABASE: japandigitaluniversityschedule
+  DB_USERNAME: root
+  DB_PASSWORD: 1234
 
 before_script:
   - apt-get update && apt-get install -y unzip
   - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
   - cp .env.example .env
   - chmod -R 777 storage bootstrap/cache
-  - mkdir -p database && touch database/database.sqlite
   - composer install --no-interaction --no-progress --prefer-dist
   - php artisan key:generate
 
@@ -22,9 +24,10 @@ test:
     - name: mysql:5.7
       alias: mysql
   script:
+    - php artisan migrate --force
     - php artisan test
 
-.deploy:
+deploy:
   stage: deploy
   only:
     - main
@@ -33,16 +36,15 @@ test:
     - apt-get install -y openssh-client
   script:
     - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST << 'EOF'
-      cd /var/www/JapanDigitalUniversitySchedule
+      cd /var/www/YOUR_PROJECT_FOLDER
       sudo docker compose down
       sudo git reset --hard
       sudo git pull
       sudo docker compose up -d --build
       sleep 1
-      sudo docker exec jdu_app php artisan migrate
-      sudo docker exec jdu_app php artisan optimize
+      docker exec $(docker ps --filter "name=jdu_app" --format "{{.ID}}") php artisan migrate --force
+      docker exec $(docker ps --filter "name=jdu_app" --format "{{.ID}}") php artisan optimize
       echo "Deploy Completed!"
       EOF
-
   dependencies:
     - test
